@@ -1,0 +1,12 @@
+#!/bin/bash
+# prerm del paquete DRFP
+set -e
+
+case "${1:-}" in
+    remove|upgrade|deconfigure|failed-upgrade)
+        systemctl stop drfp >/dev/null 2>&1 || true
+        systemctl disable drfp >/dev/null 2>&1 || true
+        ;;
+esac
+
+exit 0

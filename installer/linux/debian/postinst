@@ -1,0 +1,287 @@
+#!/bin/bash
+# postinst del paquete DRFP
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+LOG="/var/log/drfp-install.log"
+exec > >(tee -a "$LOG") 2>&1
+
+APP_DIR="/opt/DRFP/app"
+TPL_DIR="/opt/DRFP/installer/templates"
+PUERTO=8000
+URL="http://127.0.0.1:${PUERTO}"
+
+DB_PASS=""
+
+log() { echo "[drfp postinst] $*"; }
+err() { echo "[drfp postinst][ERROR] $*" >&2; }
+die() { err "$*"; exit 1; }
+
+case "${1:-}" in
+    configure) ;;
+    abort-upgrade|abort-remove|abort-deconfigure) exit 0 ;;
+    *) echo "postinst: argumento no reconocido: ${1:-}" >&2; exit 1 ;;
+esac
+
+[ -d "$APP_DIR" ] || die "No se encontro la aplicacion en $APP_DIR"
+[ -f "$APP_DIR/artisan" ] || die "No se encontro artisan en $APP_DIR"
+[ -d "$TPL_DIR" ] || die "No se encontro la carpeta de plantillas en $TPL_DIR"
+
+apt_actualizar() {
+    log "Actualizando listas de paquetes..."
+    apt-get update -y || true
+}
+
+apt_instalar() {
+    local intento
+    for intento in 1 2 3; do
+        if apt-get install -y "$@"; then
+            return 0
+        fi
+        log "apt-get fallo (intento ${intento}/3); reintentando en 5 segundos..."
+        sleep 5
+    done
+
+    err "No se pudieron instalar los paquetes: $*"
+    err "Instale manualmente con: sudo apt-get install $*"
+    case "$1" in
+        php5.6-*|software-properties-common)
+            err "Si PHP 5.6 no esta disponible, agregue el PPA: sudo add-apt-repository ppa:ondrej/php && sudo apt-get update"
+            ;;
+    esac
+    return 1
+}
+
+asegurar_ppa_php() {
+    local candidato
+    candidato="$(apt-cache policy php5.6-cli 2>/dev/null \
+        | awk '/^[[:space:]]*Candidato:|^[[:space:]]*Candidate:/{print $2}' \
+        | head -n 1)"
+    if [ -n "$candidato" ] && [ "$candidato" != "(none)" ]; then
+        return 0
+    fi
+
+    log "PHP 5.6 no esta disponible en los repositorios; agregando ppa:ondrej/php..."
+    if ! command -v add-apt-repository >/dev/null 2>&1; then
+        apt_actualizar
+        apt_instalar software-properties-common || true
+    fi
+    if command -v add-apt-repository >/dev/null 2>&1; then
+        add-apt-repository -y ppa:ondrej/php || true
+        apt_actualizar
+    fi
+}
+
+instalar_php56() {
+    local modulo faltan=0
+    local modulos="openssl pdo pdo_mysql mbstring tokenizer xml ctype json curl zip bcmath fileinfo session"
+
+    if command -v php5.6 >/dev/null 2>&1; then
+        for modulo in $modulos; do
+            if ! php5.6 -m 2>/dev/null | grep -qi "^${modulo}$"; then
+                faltan=1
+            fi
+        done
+        if [ "$faltan" -eq 0 ]; then
+            log "PHP 5.6 ya instalado: $(php5.6 -v | head -n 1)"
+            return 0
+        fi
+        log "PHP 5.6 presente pero faltan extensiones; instalando paquetes..."
+    else
+        log "PHP 5.6 no encontrado; instalando..."
+    fi
+
+    apt_actualizar
+    asegurar_ppa_php
+    apt_instalar php5.6-cli php5.6-mysql php5.6-mbstring php5.6-xml \
+        php5.6-curl php5.6-zip php5.6-bcmath php5.6-common \
+        || die "No se pudo instalar PHP 5.6"
+
+    command -v php5.6 >/dev/null 2>&1 || die "PHP 5.6 no esta disponible tras la instalacion"
+    log "PHP 5.6 instalado: $(php5.6 -v | head -n 1)"
+}
+
+instalar_mysql() {
+    if ! command -v mysqld >/dev/null 2>&1 && ! command -v mariadbd >/dev/null 2>&1; then
+        log "MariaDB/MySQL no encontrado; instalando mariadb-server..."
+        apt_actualizar
+        apt_instalar mariadb-server || apt_instalar default-mysql-server \
+            || die "No se pudo instalar MariaDB/MySQL"
+    fi
+
+    if systemctl is-active --quiet mariadb 2>/dev/null; then
+        systemctl enable mariadb >/dev/null 2>&1 || true
+    elif systemctl is-active --quiet mysql 2>/dev/null; then
+        systemctl enable mysql >/dev/null 2>&1 || true
+    else
+        systemctl enable --now mariadb >/dev/null 2>&1 \
+            || systemctl enable --now mysql >/dev/null 2>&1 \
+            || service mariadb start >/dev/null 2>&1 \
+            || service mysql start >/dev/null 2>&1 \
+            || true
+    fi
+
+    local i
+    for i in $(seq 1 30); do
+        if mysqladmin ping --silent >/dev/null 2>&1; then
+            log "MariaDB/MySQL responde"
+            return 0
+        fi
+        sleep 1
+    done
+
+    die "MariaDB/MySQL no respondio en 30 segundos"
+}
+
+configurar_base_datos() {
+    DB_PASS="$(php5.6 -r 'echo bin2hex(openssl_random_pseudo_bytes(16));' 2>/dev/null || true)"
+    if [ -z "$DB_PASS" ]; then
+        DB_PASS="$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+    fi
+
+    log "Creando base de datos y usuario..."
+    mysql -u root <<SQL || die "No se pudo crear la base de datos. Verifique que el usuario root tenga acceso local sin contrasena."
+CREATE DATABASE IF NOT EXISTS drfp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'drfp'@'localhost' IDENTIFIED BY '${DB_PASS}';
+ALTER USER 'drfp'@'localhost' IDENTIFIED BY '${DB_PASS}';
+GRANT ALL PRIVILEGES ON drfp.* TO 'drfp'@'localhost';
+FLUSH PRIVILEGES;
+SQL
+
+    mysql -u drfp -p"${DB_PASS}" -e "SELECT 1" drfp >/dev/null 2>&1 \
+        || die "No se pudo conectar a la base de datos con el usuario drfp"
+    log "Base de datos 'drfp' lista"
+}
+
+configurar_entorno() {
+    local env="$APP_DIR/.env"
+
+    if [ ! -f "$env" ]; then
+        [ -f "$TPL_DIR/env.template" ] || die "Falta la plantilla $TPL_DIR/env.template"
+        cp "$TPL_DIR/env.template" "$env"
+        log "Archivo .env creado desde la plantilla"
+    else
+        log "Archivo .env existente: se actualizara"
+    fi
+
+    sed -i "s|^APP_ENV=.*|APP_ENV=production|" "$env"
+    sed -i "s|^APP_DEBUG=.*|APP_DEBUG=false|" "$env"
+    sed -i "s|^APP_LOG_LEVEL=.*|APP_LOG_LEVEL=info|" "$env"
+    sed -i "s|^APP_URL=.*|APP_URL=${URL}|" "$env"
+    sed -i "s|^DB_HOST=.*|DB_HOST=127.0.0.1|" "$env"
+    sed -i "s|^DB_PORT=.*|DB_PORT=3306|" "$env"
+    sed -i "s|^DB_DATABASE=.*|DB_DATABASE=drfp|" "$env"
+    sed -i "s|^DB_USERNAME=.*|DB_USERNAME=drfp|" "$env"
+    sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=${DB_PASS}|" "$env"
+
+    if ! grep -q '^APP_KEY=base64:' "$env"; then
+        local clave
+        clave="base64:$(php5.6 -r 'echo base64_encode(openssl_random_pseudo_bytes(32));' 2>/dev/null || true)"
+        if [ -z "$clave" ] || [ "$clave" = "base64:" ]; then
+            clave="base64:$(head -c 32 /dev/urandom | base64 | tr -d '\n')"
+        fi
+        sed -i "s|^APP_KEY=.*|APP_KEY=${clave}|" "$env"
+        log "APP_KEY generada"
+    else
+        log "APP_KEY ya definida"
+    fi
+}
+
+migrar_y_sembrar() {
+    log "Ejecutando migraciones..."
+    ( cd "$APP_DIR" && php5.6 artisan migrate --force ) || die "Las migraciones fallaron"
+
+    local sedes
+    sedes="$(mysql -u drfp -p"${DB_PASS}" -N -B -e "SELECT COUNT(*) FROM sedes" drfp 2>/dev/null || echo 0)"
+    if [ "$sedes" = "0" ]; then
+        log "Base de datos vacia: ejecutando seeders..."
+        ( cd "$APP_DIR" && php5.6 artisan db:seed --force ) || die "Los seeders fallaron"
+    else
+        log "La base de datos ya contiene datos: no se ejecutan seeders"
+    fi
+
+    ( cd "$APP_DIR" && php5.6 artisan config:clear >/dev/null 2>&1 ) || true
+    ( cd "$APP_DIR" && php5.6 artisan cache:clear >/dev/null 2>&1 ) || true
+}
+
+aplicar_permisos() {
+    mkdir -p "$APP_DIR/storage/backups" "$APP_DIR/storage/logs" \
+        "$APP_DIR/storage/framework/views" "$APP_DIR/storage/framework/cache" \
+        "$APP_DIR/public/img/carnets"
+    chmod -R 0775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/public/img/carnets"
+    log "Permisos de escritura aplicados"
+}
+
+puerto_ocupado() {
+    if command -v ss >/dev/null 2>&1; then
+        ss -ltn 2>/dev/null | grep -q ":${PUERTO}[[:space:]]"
+    elif command -v netstat >/dev/null 2>&1; then
+        netstat -ltn 2>/dev/null | grep -q ":${PUERTO}[[:space:]]"
+    else
+        ( exec 3<>"/dev/tcp/127.0.0.1/${PUERTO}" ) 2>/dev/null
+    fi
+}
+
+instalar_servicio() {
+    local php_bin servicio i
+
+    php_bin="$(command -v php5.6 || true)"
+    [ -n "$php_bin" ] || die "No se encontro el ejecutable php5.6"
+
+    if puerto_ocupado; then
+        die "El puerto ${PUERTO} esta ocupado. Liberelo (por ejemplo: pkill -f 'artisan serve' o detenga el proceso que lo usa) e intente de nuevo."
+    fi
+
+    [ -f "$TPL_DIR/drfp.service" ] || die "Falta la plantilla $TPL_DIR/drfp.service"
+    servicio="/etc/systemd/system/drfp.service"
+    sed -e "s|@PHP_BIN@|${php_bin}|g" -e "s|@APP_DIR@|${APP_DIR}|g" \
+        "$TPL_DIR/drfp.service" > "$servicio"
+    chmod 0644 "$servicio"
+
+    systemctl daemon-reload
+    systemctl enable drfp >/dev/null 2>&1 || true
+    systemctl restart drfp || die "No se pudo iniciar el servicio drfp"
+
+    for i in $(seq 1 20); do
+        if curl -fsS -o /dev/null "$URL/" 2>/dev/null; then
+            log "El sistema responde en $URL"
+            return 0
+        fi
+        sleep 1
+    done
+
+    err "El servicio no respondio en $URL. Revise: journalctl -u drfp --no-pager"
+    systemctl status drfp --no-pager || true
+}
+
+guardar_credenciales() {
+    local ruta="/opt/DRFP/installer/credenciales-db.txt"
+    cat > "$ruta" <<EOF
+Sistema DRFP - credenciales de base de datos
+Generado: $(date '+%Y-%m-%d %H:%M:%S')
+
+Base de datos: drfp
+Usuario:       drfp
+Contrasena:    ${DB_PASS}
+Host:          127.0.0.1:3306
+
+URL:           ${URL}
+Usuario web:   admin@gmail.com (contrasena inicial del seeder: drfp2026)
+EOF
+    chmod 0600 "$ruta"
+    log "Credenciales guardadas en $ruta (solo root)"
+}
+
+log "=== Instalacion del Sistema DRFP ==="
+instalar_php56
+instalar_mysql
+configurar_base_datos
+configurar_entorno
+migrar_y_sembrar
+aplicar_permisos
+instalar_servicio
+guardar_credenciales
+
+log "=== Instalacion completada. Abra $URL en el navegador ==="
+exit 0

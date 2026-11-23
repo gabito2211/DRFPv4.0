@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Sistema DRFP
+Comment=Sistema de Gestión Bibliotecaria
+Exec=xdg-open http://127.0.0.1:8000
+Icon=/opt/DRFP/app/public/img/library.png
+Terminal=false
+Categories=Office;Education;
+StartupNotify=true

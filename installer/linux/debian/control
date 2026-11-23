@@ -1,0 +1,16 @@
+Package: drfp
+Version: 4.0.0
+Section: web
+Priority: optional
+Architecture: amd64
+Maintainer: DRFP <soporte@drfp.local>
+Depends: adduser, systemd, curl, ca-certificates, mariadb-server | mysql-server
+Recommends: php5.6-cli, php5.6-mysql, php5.6-mbstring, php5.6-xml, php5.6-curl, php5.6-zip, php5.6-bcmath, software-properties-common
+Description: Sistema de Gestión Bibliotecaria DRFP
+ Sistema web para la gestión de bibliotecas públicas: inventario, autores,
+ ubicación física, préstamos en sala y a domicilio, carnetización, sanciones,
+ visitas, visitas guiadas, planes vacacionales, bitácora y respaldos.
+ .
+ Requiere PHP 5.6 y MariaDB/MySQL. El instalador los instala
+ automáticamente si no están presentes y deja la aplicación corriendo
+ como servicio systemd en http://127.0.0.1:8000

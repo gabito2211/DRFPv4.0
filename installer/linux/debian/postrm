@@ -1,0 +1,21 @@
+#!/bin/bash
+# postrm del paquete DRFP
+set -e
+
+case "${1:-}" in
+    remove)
+        systemctl stop drfp >/dev/null 2>&1 || true
+        systemctl disable drfp >/dev/null 2>&1 || true
+        rm -f /etc/systemd/system/drfp.service
+        systemctl daemon-reload >/dev/null 2>&1 || true
+        ;;
+    purge)
+        systemctl stop drfp >/dev/null 2>&1 || true
+        systemctl disable drfp >/dev/null 2>&1 || true
+        rm -f /etc/systemd/system/drfp.service
+        rm -rf /opt/DRFP
+        systemctl daemon-reload >/dev/null 2>&1 || true
+        ;;
+esac
+
+exit 0

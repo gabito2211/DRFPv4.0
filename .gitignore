@@ -1,0 +1,13 @@
+# Esto no se manda en los commit's
+
+/vendor
+
+/node_modules
+
+/installer_win
+
+/installer_deb
+
+installer/dist/
+
+.env

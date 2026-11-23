@@ -1,0 +1,217 @@
+.modal-personalizado {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-personalizado .modal-contenido {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 550px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    animation: modalEntrada 0.3s ease;
+}
+
+@keyframes modalEntrada {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-personalizado .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-personalizado .modal-header h2 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.4rem;
+}
+
+.modal-personalizado .btn-cerrar-modal {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #d63031;
+    font-size: 24px;
+    transition: transform 0.2s;
+}
+
+.modal-personalizado .btn-cerrar-modal:hover {
+    transform: scale(1.2);
+}
+
+.modal-personalizado .modal-body p {
+    margin: 12px 0;
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-personalizado .modal-body strong {
+    display: inline-block;
+    width: 100px;
+    color: #4a5568;
+}
+
+.modal-personalizado .modal-footer {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 15px;
+    margin-top: 15px;
+    text-align: right;
+}
+
+/* Estilos para el formulario dentro del modal */
+.modal-personalizado .rejilla-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.modal-personalizado .grupo-campo {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-personalizado .grupo-campo label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #4a5568;
+}
+
+.modal-personalizado .entrada {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+}
+
+.modal-personalizado .ancho-total {
+    grid-column: span 2;
+}
+
+.modal-personalizado .fila-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-azul {
+    background: #3182ce;
+    color: white;
+}
+
+.btn-gris {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+@media (max-width: 600px) {
+    .modal-personalizado .rejilla-form {
+        grid-template-columns: 1fr;
+    }
+    .modal-personalizado .ancho-total {
+        grid-column: span 1;
+    }
+}
+/* Estilos específicos para el modal de editar */
+#modal-editar-persona {
+    display: none !important;
+}
+
+#modal-editar-persona[style*="display: flex"] {
+    display: flex !important;
+}
+
+#modal-editar-persona .modal-contenido {
+    max-width: 650px;
+    width: 90%;
+}
+
+#modal-editar-persona .rejilla-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+#modal-editar-persona .grupo-campo {
+    display: flex;
+    flex-direction: column;
+}
+
+#modal-editar-persona .grupo-campo label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #4a5568;
+}
+
+#modal-editar-persona .entrada {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+#modal-editar-persona .entrada:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49,130,206,0.1);
+}
+
+#modal-editar-persona .ancho-total {
+    grid-column: span 2;
+}
+
+#modal-editar-persona .fila-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+@media (max-width: 600px) {
+    #modal-editar-persona .rejilla-form {
+        grid-template-columns: 1fr;
+    }
+    #modal-editar-persona .ancho-total {
+        grid-column: span 1;
+    }
+}

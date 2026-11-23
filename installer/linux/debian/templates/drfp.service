@@ -1,0 +1,14 @@
+[Unit]
+Description=Sistema DRFP (Laravel 5.4 / PHP 5.6)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=@APP_DIR@
+ExecStart=@PHP_BIN@ @APP_DIR@/artisan serve --host=127.0.0.1 --port=8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,305 @@
+@import url('tema.css');
+
+:root {
+    --sidebar-bg: #1e293b;
+    --sidebar-hover: #334155;
+    --sidebar-active: #3b82f6;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --content-bg: #f1f5f9;
+    --transition-speed: 0.3s;
+    --sidebar-width-expanded: 260px;
+    --sidebar-width-collapsed: 80px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    scrollbar-color: var(--borde) transparent;
+    scrollbar-width: thin;
+}
+
+/* Webkit global */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--fondo-sitio);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--borde);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primario);
+}
+
+body {
+    display: flex;
+    background-color: var(--content-bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- SIDEBAR STYLES --- */
+#sidebar {
+    width: var(--sidebar-width-expanded);
+    background-color: var(--sidebar-bg);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: width var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+}
+
+#sidebar.collapsed {
+    width: var(--sidebar-width-collapsed);
+}
+
+/* Logo Area */
+.sidebar-header {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--sidebar-hover);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.logo-text {
+    font-weight: 700;
+    font-size: 1.2rem;
+    transition: opacity var(--transition-speed);
+}
+
+#sidebar.collapsed .logo-text {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 6px;
+    transition: background var(--transition-speed);
+}
+
+.toggle-btn:hover {
+    background-color: var(--sidebar-hover);
+}
+
+/* Navigation Links */
+.nav-list {
+    list-style: none;
+    padding: 10px;
+    flex-grow: 1;
+    margin-top: 10px;
+    
+    /* --- NUEVAS LÍNEAS AÑADIDAS --- */
+    overflow-y: auto; /* Habilita el desplazamiento vertical si el contenido excede el alto */
+    overflow-x: hidden; /* Previene un molesto scroll horizontal accidental */
+}
+
+.nav-item {
+    margin-bottom: 8px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.nav-link:hover {
+    background-color: var(--sidebar-hover);
+    color: var(--text-main);
+}
+
+/* Botones dentro del nav (ej. selector de tema) */
+button.nav-link {
+    border: none;
+    background: none;
+    width: 100%;
+    font: inherit;
+    font-size: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.nav-link.active {
+    background-color: var(--sidebar-active);
+    color: white;
+}
+
+.link-icon {
+    min-width: 24px;
+    margin-right: 15px;
+}
+
+.link-text {
+    transition: opacity var(--transition-speed);
+}
+
+#sidebar.collapsed .link-text {
+    opacity: 0;
+}
+
+/* User Profile Section */
+.sidebar-footer {
+    padding: 15px;
+    border-top: 1px solid var(--sidebar-hover);
+    background-color: rgba(0,0,0,0.1);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-main);
+    text-decoration: none;
+    overflow: hidden;
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+    background-color: var(--sidebar-active);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    transition: opacity var(--transition-speed);
+}
+
+#sidebar.collapsed .user-info {
+    opacity: 0;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* --- MAIN CONTENT STYLES --- */
+#main-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-left: var(--sidebar-width-expanded);
+    transition: margin-left var(--transition-speed) ease;
+    min-height: 100vh; /* Asegura que ocupe toda la pantalla */
+}
+
+#sidebar.collapsed ~ #main-wrapper {
+    margin-left: var(--sidebar-width-collapsed);
+}
+
+#main-content {
+    padding: 30px;
+    flex: 1 0 auto; /* Permite que el contenido crezca y empuje al footer */
+}
+
+.card {
+    background: var(--fondo-tarjeta);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+h1 {
+    color: var(--texto-oscuro);
+}
+
+p {
+    color: var(--texto-suave);
+    line-height: 1.6;
+}
+
+/* --- FOOTER STYLES --- */
+footer {
+    flex-shrink: 0; /* Evita que el footer se encoja */
+    background-color: var(--fondo-tarjeta);
+    border-top: 1px solid var(--borde);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--texto-suave);
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: var(--texto-suave);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: var(--sidebar-active);
+}
+
+/* Mobile View (Quick fix) */
+@media (max-width: 768px) {
+    #sidebar {
+        left: -260px;
+    }
+    #sidebar.mobile-open {
+        left: 0;
+        width: 260px;
+    }
+    #main-wrapper {
+        margin-left: 0 !important;
+    }
+    footer {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+}

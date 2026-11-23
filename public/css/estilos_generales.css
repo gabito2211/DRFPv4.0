@@ -1,0 +1,229 @@
+/* --- CONFIGURACIÓN BASE Y VARIABLES --- */
+:root {
+    --primario: #3b82f6;
+    --primario-hover: #2563eb;
+    --fondo-sitio: #f1f5f9;
+    --fondo-tarjeta: #ffffff;
+    --texto-oscuro: #1e293b;
+    --texto-suave: #475569;
+    --texto-claro: #94a3b8;
+    --borde: #cbd5e1;
+    --error: #ef4444;
+    --exito: #10b981;
+    --sombra: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* --- CONTENEDORES --- */
+.contenedor-form {
+    background: var(--fondo-tarjeta);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--sombra);
+    /* Se cambió margin-top por margin para centrado horizontal */
+    margin: 0 auto; 
+    max-width: 800px;
+    width: 100%;
+}
+
+.titulo-form {
+    border-bottom: 2px solid var(--fondo-sitio);
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titulo-form h2 {
+    color: var(--texto-oscuro);
+    font-size: 1.5rem;
+}
+
+.rejilla-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ancho-total {
+    grid-column: span 2;
+}
+
+.grupo-campo label {
+    font-weight: 600;
+    color: var(--texto-suave);
+    font-size: 0.9rem;
+}
+
+/* --- ENTRADAS DE DATOS --- */
+.entrada,
+.seleccion,
+.area-texto {
+    padding: 10px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s ease;
+    background-color: var(--fondo-tarjeta);
+    width: 100%;
+    color: var(--texto-oscuro);
+}
+
+/* Campos de solo lectura (ej. cota en edición de libro) */
+.entrada-readonly {
+    background-color: var(--fondo-sitio);
+    color: var(--texto-suave);
+    cursor: not-allowed;
+}
+
+/* Notas auxiliares bajo los campos */
+.nota-campo {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
+.area-texto {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Estados de Foco */
+.entrada:focus, 
+.seleccion:focus, 
+.area-texto:focus {
+    border-color: var(--primario);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.entrada:disabled, 
+.seleccion:disabled, 
+.area-texto:disabled {
+    background-color: var(--fondo-sitio);
+    color: var(--texto-claro);
+    cursor: not-allowed;
+}
+
+/* --- OPCIONES (RADIO, CHECKBOX) --- */
+.opciones-grupo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 8px 0;
+}
+
+.opcion-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--texto-suave);
+    font-size: 0.95rem;
+}
+
+/* --- BOTONES --- */
+.fila-botones {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    font-size: 1rem;
+    border: none;
+}
+
+.btn-azul {
+    background-color: var(--primario);
+    color: white;
+}
+
+.btn-azul:hover {
+    background-color: var(--primario-hover);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-gris {
+    background-color: var(--fondo-sitio);
+    color: var(--texto-suave);
+}
+
+/* --- INDICADOR DE CARGA EN BOTONES --- */
+.btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-right-color: currentColor;
+    border-radius: 50%;
+    display: inline-block;
+    animation: girar-carga 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+.cargando {
+    opacity: 0.75;
+    cursor: wait !important;
+    pointer-events: none;
+}
+
+@keyframes girar-carga {
+    to { transform: rotate(360deg); }
+}
+
+/* --- RESPONSIVIDAD --- */
+@media (max-width: 600px) {
+    .rejilla-form {
+        grid-template-columns: 1fr;
+    }
+    .ancho-total {
+        grid-column: span 1;
+    }
+}
+/* Estilos para Notificaciones Dinámicas (registro encontrado) */
+.toast-alerta {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--fondo-tarjeta);
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    min-width: 280px;
+    display: flex;
+    align-items: center;
+    animation: aparecer 0.4s ease forwards;
+    border-left: 5px solid #28a745; /* Verde por defecto */
+}
+
+.toast-alerta.informativo {
+    border-left-color: #3b82f6; /* Azul para búsquedas */
+}
+
+.toast-contenido { display: flex; align-items: center; gap: 12px; }
+.icono-info { color: #3b82f6; width: 24px; height: 24px; }
+.titulo-msg { font-weight: bold; color: var(--texto-oscuro); display: block; }
+.mensaje-texto p { margin: 0; color: var(--texto-suave); font-size: 13px; }
+
+@keyframes aparecer {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}

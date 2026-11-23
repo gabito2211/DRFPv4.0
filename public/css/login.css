@@ -1,0 +1,207 @@
+
+:root {
+    --login-bg: #1e293b;
+    --login-card-bg: rgba(255, 255, 255, 0.95);
+    --accent-color: #3b82f6;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    /* Se asegura que la ruta coincida con la ubicación del archivo subido */
+    background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), 
+        url('../img/biblioteca.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: var(--login-bg); /* Fondo de respaldo en caso de error de carga */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    z-index: 10;
+}
+
+.login-card {
+    background: var(--login-card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-header {
+    margin-bottom: 30px;
+}
+
+.login-logo {
+    background: #eff6ff;
+    width: 80px; /* Aumentado de 64px */
+    height: 80px; /* Aumentado de 64px */
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.login-header h1 {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin: 0;
+}
+
+.login-header p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #475569;
+    font-size: 0.85rem;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    outline: none;
+    background: white;
+}
+
+.input-wrapper input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-login:hover {
+    background-color: #2563eb;
+}
+
+.login-footer {
+    margin-top: 25px;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.error-msg {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    display: none;
+    align-items: center;
+    gap: 8px;
+}
+
+/* === SELECT DE SEDE EN LA ESQUINA SUPERIOR DERECHA === */
+.top-right-select {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 14px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.top-right-select label {
+    display: flex;
+    align-items: center;
+    color: var(--accent-color);
+}
+
+.top-right-select select {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+}
+
+.top-right-select select option {
+    background: #ffffff;
+    color: #1e293b;
+}
+/* --- INDICADOR DE CARGA EN BOTONES --- */
+.btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-right-color: currentColor;
+    border-radius: 50%;
+    display: inline-block;
+    animation: girar-carga 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+.cargando {
+    opacity: 0.75;
+    cursor: wait !important;
+    pointer-events: none;
+}
+
+@keyframes girar-carga {
+    to { transform: rotate(360deg); }
+}

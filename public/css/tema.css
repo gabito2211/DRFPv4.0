@@ -1,0 +1,141 @@
+/* ============================================ */
+/* TEMA OSCURO - DRFP v4.0                      */
+/* Se activa con body[data-theme="dark"]        */
+/* Sobreescribe las variables de :root          */
+/* ============================================ */
+
+body[data-theme="dark"] {
+    --fondo-sitio: #0f172a;
+    --fondo-tarjeta: #1e293b;
+    --texto-oscuro: #f1f5f9;
+    --texto-suave: #cbd5e1;
+    --texto-claro: #64748b;
+    --borde: #334155;
+    --content-bg: #0f172a;
+    --text-muted: #94a3b8;
+    --sombra: 0 4px 10px -2px rgba(0, 0, 0, 0.55);
+
+    /* Color base heredable para textos sin estilo propio */
+    color: var(--texto-suave);
+}
+
+/* Encabezados en oscuro (h1 ya usa variable en plantilla.css) */
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] h4,
+body[data-theme="dark"] h5,
+body[data-theme="dark"] h6 {
+    color: var(--texto-oscuro);
+}
+
+/* Inputs deshabilitados */
+body[data-theme="dark"] .entrada:disabled,
+body[data-theme="dark"] .seleccion:disabled,
+body[data-theme="dark"] .area-texto:disabled {
+    background-color: #172033;
+}
+
+/* Zonas de arrastre de foto (carnets) */
+body[data-theme="dark"] #drop-zone-foto,
+body[data-theme="dark"] #drop-zone-edit-foto {
+    background: #172033;
+}
+
+/* Calendario: días con visitas (verde) legible en oscuro */
+body[data-theme="dark"] .cal-dia.con-visita {
+    background-color: #064e3b;
+    color: #d1fae5;
+    border-color: #10b981;
+}
+
+body[data-theme="dark"] .cal-dia.con-visita:hover {
+    background-color: #065f46;
+}
+
+/* ============================================ */
+/* COMPATIBILIDAD CON VISTAS                    */
+/* (estilos inline y <style> locales que usan   */
+/*  blancos fijos)                              */
+/* ============================================ */
+
+/* --- Blancos inline → superficie de tarjeta --- */
+body[data-theme="dark"] [style*="background: white"],
+body[data-theme="dark"] [style*="background:white"],
+body[data-theme="dark"] [style*="background: #fff;"],
+body[data-theme="dark"] [style*="background:#fff;"],
+body[data-theme="dark"] [style*="background: #ffffff"],
+body[data-theme="dark"] [style*="background:#ffffff"],
+body[data-theme="dark"] [style*="background-color: white"],
+body[data-theme="dark"] [style*="background-color:white"],
+body[data-theme="dark"] [style*="background-color: #fff;"],
+body[data-theme="dark"] [style*="background-color:#fff;"],
+body[data-theme="dark"] [style*="background-color: #ffffff"],
+body[data-theme="dark"] [style*="background-color:#ffffff"] {
+    background: var(--fondo-tarjeta) !important;
+}
+
+/* --- Superficies suaves inline (#f8fafc / #f1f5f9) --- */
+body[data-theme="dark"] [style*="background: #f8fafc"],
+body[data-theme="dark"] [style*="background:#f8fafc"],
+body[data-theme="dark"] [style*="background: #f1f5f9"],
+body[data-theme="dark"] [style*="background:#f1f5f9"] {
+    background: var(--fondo-sitio) !important;
+}
+
+/* --- Textos oscuros inline → claros --- */
+body[data-theme="dark"] [style*="color: #333"],
+body[data-theme="dark"] [style*="color: #2d3436"],
+body[data-theme="dark"] [style*="color: #1e293b"],
+body[data-theme="dark"] [style*="color: #0f172a"] {
+    color: var(--texto-oscuro) !important;
+}
+
+body[data-theme="dark"] [style*="color: #64748b"],
+body[data-theme="dark"] [style*="color: #475569"],
+body[data-theme="dark"] [style*="color: #636e72"],
+body[data-theme="dark"] [style*="color: #2d3748"],
+body[data-theme="dark"] [style*="color: #4a5568"] {
+    color: var(--texto-suave) !important;
+}
+
+/* --- Clases locales de vistas con fondo blanco --- */
+body[data-theme="dark"] .modal-content,
+body[data-theme="dark"] .modal-ver-content,
+body[data-theme="dark"] .modal-contenido,
+body[data-theme="dark"] .card-ajuste,
+body[data-theme="dark"] .metric-card,
+body[data-theme="dark"] .cronograma-container,
+body[data-theme="dark"] .grafico-container {
+    background: var(--fondo-tarjeta);
+}
+
+body[data-theme="dark"] .info-box,
+body[data-theme="dark"] .ver-detalle-texto {
+    background: var(--fondo-sitio);
+}
+
+body[data-theme="dark"] .select-plazo {
+    background: var(--fondo-tarjeta);
+    border-color: var(--borde);
+    color: var(--texto-oscuro);
+}
+
+body[data-theme="dark"] .info-box {
+    border-color: var(--borde);
+}
+
+/* --- Modal de registro de visitas --- */
+body[data-theme="dark"] .modal-personalizado .modal-contenido {
+    background: var(--fondo-tarjeta);
+}
+
+body[data-theme="dark"] .modal-personalizado .modal-header h2 {
+    color: var(--texto-oscuro);
+}
+
+body[data-theme="dark"] .modal-personalizado .modal-body p,
+body[data-theme="dark"] .modal-personalizado .modal-body strong,
+body[data-theme="dark"] .modal-personalizado .grupo-campo label {
+    color: var(--texto-suave);
+}
+

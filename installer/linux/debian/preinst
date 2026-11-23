@@ -1,0 +1,37 @@
+#!/bin/bash
+# preinst del paquete DRFP
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+log() { echo "[drfp preinst] $*"; }
+
+case "${1:-}" in
+    install|upgrade) ;;
+    abort-upgrade) exit 0 ;;
+    *) exit 0 ;;
+esac
+
+php_instalable() {
+    local candidato
+    candidato="$(apt-cache policy php5.6-cli 2>/dev/null \
+        | awk '/^[[:space:]]*Candidato:|^[[:space:]]*Candidate:/{print $2}' \
+        | head -n 1)"
+    [ -n "$candidato" ] && [ "$candidato" != "(none)" ]
+}
+
+if ! command -v php5.6 >/dev/null 2>&1; then
+    if ! php_instalable; then
+        log "PHP 5.6 no esta disponible en los repositorios; agregando ppa:ondrej/php..."
+        if ! command -v add-apt-repository >/dev/null 2>&1; then
+            apt-get update -y >/dev/null 2>&1 || true
+            apt-get install -y software-properties-common >/dev/null 2>&1 || true
+        fi
+        if command -v add-apt-repository >/dev/null 2>&1; then
+            add-apt-repository -y ppa:ondrej/php || true
+            apt-get update -y >/dev/null 2>&1 || true
+        fi
+    fi
+fi
+
+exit 0
